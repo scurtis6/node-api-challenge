@@ -1,6 +1,6 @@
 const express = require('express');
 const Projects = require('../data/helpers/projectModel');
-// const Actions = require('../data/helpers/actionModel');
+const Actions = require('../data/helpers/actionModel');
 
 const router = express.Router();
 
@@ -64,18 +64,18 @@ router.delete('/:id', validateProjectId, (req, res) => {
     })
 });
 
-// router.get("/actions/:id", validateProjectId, (req, res) => {
-//     const { id } = req.params;
-//     Projects
-//     .getProjectActions(id)
-//     .then(postactions => {
-//     res.status(200).json(postactions);
-//     })
-//     .catch(err => {
-//         console.log(err);
-//         res.status(500).json({ errormessage: "error getting all actions by projects id" });
-//     });
-// });
+router.get('/:id/actions', validateProjectId, (req, res) => {
+    const { id } = req.params;
+    Projects
+    .getProjectActions(id)
+    .then(postactions => {
+    res.status(200).json(postactions);
+    })
+    .catch(err => {
+        console.log(err);
+        res.status(500).json({ errormessage: "error getting all actions by projects id" });
+    });
+});
 
 function validateProjectId(req, res, next) {
     const { id } = req.params;

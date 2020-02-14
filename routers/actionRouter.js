@@ -1,7 +1,9 @@
 const express = require('express');
 const Actions = require('../data/helpers/actionModel');
 
-const router = express.Router();
+const router = express.Router({
+    mergeParams: true
+});
 
 router.get('/', (req, res) => {
     Actions
@@ -38,16 +40,23 @@ router.get('/:id', validateActionId, (req, res) => {
 //     })
 // });
 
-router.post('/', validateAction, (req, res) => {
-    Actions
-    .insert(req.body)
-    .then(action => {
-        res.status(200).json({ message: 'This action was added' })
-    })
-    .catch(err => {
-        console.log(err)
-        res.status(500).json({ error: 'Error adding new action' })
-    })
+router.post('/project/:id', validateAction, (req, res) => {
+    const {id} = req.params;
+    const {description,notes} = req.body;
+    const {body} = req;
+
+    if(description, notes) {
+        body.projectId = id;
+        Actions
+        .insert(body)
+        .then(action => {
+            res.status(200).json({ message: 'This action was added' })
+        })
+        .catch(err => {
+            console.log(err)
+            res.status(500).json({ error: 'Error adding new action' })
+        })
+    }
 });
 
 router.put('/:id', validateActionId, validateAction, (req, res) => {
