@@ -29,6 +29,19 @@ router.get('/:id', validateActionId, (req, res) => {
     })
 });
 
+router.get('/:id/projects', validateActionId, (req, res) => {
+    const { id } = req.params;
+    Actions
+    .get(id)
+    .then(action => {
+        res.status(201).json(action)
+    })
+    .catch(err => {
+        res.status(500).json({ error: 'Error retrieving action by ID' })
+    })
+});
+
+// *This doesn't exist*
 // router.post('/', validateAction, (req, res) => {
 //     Actions
 //     .insert(req.body)
@@ -40,26 +53,19 @@ router.get('/:id', validateActionId, (req, res) => {
 //     })
 // });
 
-router.post('/project/:id', validateAction, (req, res) => {
-    const {id} = req.params;
-    const {description,notes} = req.body;
-    const {body} = req;
-
-    if(description, notes) {
-        body.projectId = id;
-        Actions
-        .insert(body)
-        .then(action => {
-            res.status(200).json({ message: 'This action was added' })
-        })
-        .catch(err => {
-            console.log(err)
-            res.status(500).json({ error: 'Error adding new action' })
-        })
-    }
+router.post('/:id/projects', validateActionId, validateAction, (req, res) => {
+    const project = { ...req.body, project_id: req.params.id };
+    Actions
+    .insert(project)
+    .then(action => {
+        res.status(200).json({ message: 'This action was added' })
+    })
+    .catch(err => {
+        res.status(500).json({ error: 'Error adding new action' })
+    })
 });
 
-router.put('/:id', validateActionId, validateAction, (req, res) => {
+router.put('/:id', validateActionId, validateStringLength, (req, res) => {
     const { id } = req.params;
     const {description, notes} = req.body;
     Actions
@@ -108,6 +114,17 @@ function validateAction(req, res, next) {
         res.status(400).json({ error: 'missing required description and/or notes field' })
     }
     next();
+};
+
+function validateStringLength(req,res,next) {
+    const description = req.body.description || "";
+
+    if (description.length <= 128) {
+        next();
+    }
+    else {
+        res.status(400).json({error: "description cannot exceed 128 characters"})
+    }
 };
 
 module.exports = router;
